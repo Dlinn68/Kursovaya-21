@@ -1,0 +1,652 @@
+#include <SFML\Graphics.hpp>
+#include <time.h>
+#include <iostream>
+#include <sstream>
+
+#define X 1200
+#define Y 980
+
+using namespace sf;
+
+int CMP = 0;
+
+class Card
+{
+	char name;
+	int score;
+	int number;
+	int flag_vzali = 0;
+public:
+
+
+	int getScore()
+	{
+		return score;
+	}
+	void setScore(int score)
+	{
+		this->score = score;
+	}
+
+	char getName()
+	{
+		return name;
+	}
+	void setName(char name)
+	{
+		this->name = name;
+	}
+
+	int getFlag_vzali()
+	{
+		return flag_vzali;
+	}
+	void setFlag_vzali(int flag)
+	{
+		this->flag_vzali = flag;
+	}
+};
+
+class Game
+{
+	int score_player = 0;
+	int	score_opponent1 = 0;
+	int	score_opponent2 = 0;
+	Card* koloda;
+	int nominal;
+	int gamers;
+	int random;
+	Card tmp;
+public:
+	int kolvo;
+	void setScore_player(int score)
+	{
+		score_player = score;
+	}
+
+	int getScore_player()
+	{
+		return score_player;
+	}
+
+	void setScore_opponent1(int score)
+	{
+		score_opponent1 = score;
+	}
+
+	int getScore_opponent1()
+	{
+		return score_opponent1;
+	}
+
+	void setScore_opponent2(int score)
+	{
+		score_opponent2 = score;
+	}
+
+	int getScore_opponent2()
+	{
+		return score_opponent2;
+	}
+
+	int getGamers()
+	{
+		return gamers;
+	}
+
+	void make_deck()
+	{
+		std::cout << "Vvedite kol-vo kart (ne men`we 14)" << std::endl;
+		std::cin >> kolvo;
+		koloda = new Card[kolvo];
+		for (int i = 0; i < kolvo; i++)
+		{
+			nominal = i;
+			switch (nominal % 14)
+			{
+			case(0):
+				koloda[i].setName('1');
+				koloda[i].setScore(1);
+
+				break;
+			case(1):
+				koloda[i].setName('2');
+				koloda[i].setScore(2);
+
+				break;
+			case(2):
+				koloda[i].setName('3');
+				koloda[i].setScore(3);
+				break;
+			case(3):
+				koloda[i].setName('4');
+				koloda[i].setScore(4);
+				break;
+			case(4):
+				koloda[i].setName('5');
+				koloda[i].setScore(5);
+				break;
+			case(5):
+				koloda[i].setName('6');
+				koloda[i].setScore(6);
+				break;
+			case(6):
+				koloda[i].setName('7');
+				koloda[i].setScore(7);
+				break;
+			case(7):
+				koloda[i].setName('8');
+				koloda[i].setScore(8);
+				break;
+			case(8):
+				koloda[i].setName('9');
+				koloda[i].setScore(9);
+				break;
+			case(9):
+				koloda[i].setName('10');
+				koloda[i].setScore(10);
+				break;
+			case(10):
+				koloda[i].setName('V');
+				koloda[i].setScore(2);
+				break;
+			case(11):
+				koloda[i].setName('D');
+				koloda[i].setScore(3);
+				break;
+			case(12):
+				koloda[i].setName('K');
+				koloda[i].setScore(4);
+				break;
+			case(13):
+				koloda[i].setName('T');
+				koloda[i].setScore(11);
+				break;
+			}
+		}
+		for (int i = 0; i < kolvo; i++)
+		{
+			random = rand() % kolvo;
+			tmp = koloda[i];
+			koloda[i] = koloda[random];
+			koloda[random] = tmp;
+		}
+
+		std::cout << "Vvedite kol-vo igrokov (2 ili 3)" << std::endl;
+		std::cin >> gamers;
+		
+	}
+
+	void peremewat()
+	{
+		for (int i = 0; i < kolvo; i++)
+		{
+			random = rand() % kolvo;
+			tmp = koloda[i];
+			koloda[i] = koloda[random];
+			koloda[random] = tmp;
+		}
+	}
+
+	int proverka(int player, int opponent, int diller)
+	{
+		if (player > opponent)
+		{
+			return 1;
+		}
+		if (player < opponent)
+		{
+			return 0;
+		}
+		if (player == opponent)
+		{
+			if (diller == 1)
+			{
+				return 1;
+			}
+			if(diller == 2)
+			{
+				return 0;
+			}
+			if (diller == 3)
+			{
+				return 2;
+			}
+		}
+	}
+
+	int proverka(int player, int opponent1, int opponent2, int diller)
+	{
+		if (player > 21)
+		{
+			return 0;
+		}
+		if ((player > opponent1) && (player <= 21))
+		{
+			if ((player > opponent2))
+				return 1;
+			if ((player == opponent2))
+			{
+				if (diller == 1)
+				{
+					return 1;
+				}
+				if (diller == 3)
+				{
+					return 0;
+				}
+				if (diller == 2 || diller == 4)
+				{
+					return 2;
+				}
+			}
+			else
+				return 0;
+		}
+
+		if ((player < opponent1) && (opponent1 <= 21))
+		{
+			return 0;
+		}
+
+		if (player == opponent1)
+		{
+			if (diller == 1)
+			{
+				return 1;
+			}
+			if (diller == 2)
+			{
+				return 0;
+			}
+			if ((diller == 3 || diller == 4) && (player > opponent2))
+			{
+				return 2;
+			}
+			if ((diller == 3 || diller == 4) && (player < opponent2))
+			{
+				return 0;
+			}
+			if ((diller == 4) && (player = opponent2))
+			{
+				return 0;
+			}
+		}
+	}
+
+	char takeCard(int cmp)
+	{
+		return koloda[cmp].getName();
+	}
+
+	void setFlag(int tmp, int flag)
+	{
+		koloda[tmp].setFlag_vzali(flag);
+	}
+
+	int getFlag(int tmp)
+	{
+		return koloda[tmp].getFlag_vzali();
+	}
+};
+
+
+
+int main()
+{
+	int fl = 0;
+	int diller;
+#pragma warning(disable : 4996)
+	Font font;//шрифт 
+	font.loadFromFile("CyrilicOld.ttf");//передаем нашему шрифту файл шрифта
+	Text text("", font, 50);//создаем объект текст. закидываем в объект текст строку, шрифт, размер шрифта(в пикселях);//сам объект текст (не строка)
+	text.setColor(sf::Color::White);//покрасили текст в красный. если убрать эту строку, то по умолчанию он белый
+	text.setStyle(Text::Bold | Text::Underlined);//жирный и подчеркнутый текст. по умолчанию он "худой":)) и не подчеркнутый
+	text.setPosition(200, 100);//задаем позицию текста
+
+	RenderWindow app(VideoMode(X, Y), "21(Ochko) or Black Jack");
+
+	// Создаём переменную текстуры
+	Texture texture1, texture2, texture3,
+		texture4, texture5, texture6, texture7,
+		texture8, texture9, texture10, textureV,
+		textureD, textureK, textureT, textureR,
+		textureEWE, textureHVATIT, texturePEREMEWAT, textureWIN, textureLOSE, textureFON;
+
+	// Подгружаем нашу текстуру из файла 
+	texture1.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\1.jpg");
+	texture2.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\2.jpg");
+	texture3.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\3.jpg");
+	texture4.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\4.jpg");
+	texture5.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\5.jpg");
+	texture6.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\6.jpg");
+	texture7.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\7.jpg");
+	texture8.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\8.jpg");
+	texture9.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\9.jpg");
+	texture10.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\10.jpg");
+	textureV.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\Valet.jpg");
+	textureD.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\Dama.jpg");
+	textureK.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\Korol.jpg");
+	textureT.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\Tuz.jpg");
+	textureR.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\Rubashka.jpg");
+
+	textureLOSE.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\LOSE.bmp");
+	textureWIN.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\WIN.bmp");
+
+	textureEWE.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\EWE.bmp");
+	textureHVATIT.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\HVATIT.bmp");
+	texturePEREMEWAT.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\PEREMEWAT.bmp");
+
+	textureFON.loadFromFile("C:\\Users\\Timofey\\source\\repos\\SFML_21\\SFML_21\\cards\\FON.jpg");
+	// Создаём спрайты
+	Sprite sprite1(texture1);
+	Sprite sprite2(texture2);
+	Sprite sprite3(texture3);
+	Sprite sprite4(texture4);
+	Sprite sprite5(texture5);
+	Sprite sprite6(texture6);
+	Sprite sprite7(texture7);
+	Sprite sprite8(texture8);
+	Sprite sprite9(texture9);
+	Sprite sprite10(texture10);
+	Sprite spriteV(textureV);
+	Sprite spriteD(textureD);
+	Sprite spriteK(textureK);
+	Sprite spriteT(textureT);
+	Sprite spriteR(textureR);
+
+	Sprite spriteWIN(textureWIN);
+	Sprite spriteLOSE(textureLOSE);
+
+	Sprite spriteEWE(textureEWE);
+	Sprite spriteHVATIT(textureHVATIT);
+	Sprite spritePEREMEWAT(texturePEREMEWAT);
+
+	Sprite spriteFON(textureFON);
+
+	spriteEWE.move(900.f, 440.f);
+	spriteHVATIT.move(1000.f, 440.f);
+	spritePEREMEWAT.move(950.f, 300.f);
+
+	spriteR.move(740.f, 250.f);
+
+	spriteLOSE.move(200.f, 300.f);
+	spriteWIN.move(200.f, 100.f);
+
+	Game GAME;
+	GAME.make_deck();
+
+	int itog;
+	int you_win=0;
+	int you_lose=0;
+	int draw = 0;
+	
+	Text textopponent2("", font, 50);//создаем объект текст. закидываем в объект текст строку, шрифт, размер шрифта(в пикселях);//сам объект текст (не строка)
+	if (GAME.getGamers() == 2)
+	{
+		diller = rand() % 3 + 1;
+	}
+	if (GAME.getGamers() == 3)
+	{
+		diller = rand() % 4 + 1;
+		
+		textopponent2.setColor(sf::Color::White);//покрасили текст в красный. если убрать эту строку, то по умолчанию он белый
+		textopponent2.setStyle(Text::Bold | Text::Underlined);//жирный и подчеркнутый текст. по умолчанию он "худой":)) и не подчеркнутый
+		textopponent2.setPosition(200, 300);//задаем позицию текста
+	}
+
+	Text textopponent1("", font, 50);//создаем объект текст. закидываем в объект текст строку, шрифт, размер шрифта(в пикселях);//сам объект текст (не строка)
+	textopponent1.setColor(sf::Color::White);//покрасили текст в красный. если убрать эту строку, то по умолчанию он белый
+	textopponent1.setStyle(Text::Bold | Text::Underlined);//жирный и подчеркнутый текст. по умолчанию он "худой":)) и не подчеркнутый
+	textopponent1.setPosition(200, 200);//задаем позицию текста
+
+	while (app.isOpen())
+	{
+		std::ostringstream playerScoreString;    // объявили переменную
+		std::ostringstream opponent1ScoreString;
+		if (GAME.getGamers() == 3)
+		{
+			std::ostringstream opponent2ScoreString;
+			opponent2ScoreString << GAME.getScore_opponent2();
+			textopponent2.setString("Очки противника 2: " + opponent2ScoreString.str());
+		}
+		playerScoreString << GAME.getScore_player();		//занесли в нее число очков, то есть формируем строку
+		text.setString("Ваши очки: " + playerScoreString.str());//задаем строку тексту и вызываем сформированную выше строку методом .str()
+		opponent1ScoreString << GAME.getScore_opponent1();
+		textopponent1.setString("Очки противника 1: " + opponent1ScoreString.str());
+		
+
+		//Вектор, хранящий координаты курсора мыши
+		Vector2i mousePoz = Mouse::getPosition(app);
+		Event event;
+
+		while (app.pollEvent(event))
+		{
+
+
+			switch (event.type)
+			{
+			case Event::Closed:
+				app.close();
+				break;
+			case Event::MouseButtonPressed:
+				if ((event.key.code == Mouse::Left) && (spriteHVATIT.getGlobalBounds().contains(mousePoz.x, mousePoz.y)))
+				{
+					if (GAME.getGamers() == 2)
+					{
+						itog = GAME.proverka(GAME.getScore_player(), GAME.getScore_opponent1(), 3);
+					}
+					if (GAME.getGamers() == 3)
+					{
+						itog = GAME.proverka(GAME.getScore_player(), GAME.getScore_opponent1(), GAME.getScore_opponent2(), diller);
+					}
+					
+					if (itog == 0)
+						you_lose = 1;
+					
+					if (itog == 1)
+					{
+						you_win = 1;
+					}
+
+					if (itog == 2)
+						draw = 1;
+					
+				}
+				if ((event.key.code == Mouse::Left) && (spriteEWE.getGlobalBounds().contains(mousePoz.x, mousePoz.y)))
+				{
+					fl = 1;
+					switch (GAME.takeCard(CMP))
+					{
+					case('1'):
+						
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 1);
+						break;
+					case('2'):
+						//sprite2.setPosition(150 * CMP, Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 2);
+						break;
+					case('3'):
+						//sprite3.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 3);
+						break;
+					case('4'):
+					//	sprite4.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 4);
+						break;
+					case('5'):
+						//sprite5.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 5);
+						break;
+					case('6'):
+						//sprite6.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 6);
+						break;
+					case('7'):
+
+						//sprite7.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 7);
+						break;
+					case('8'):
+						//sprite8.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 8);
+						break;
+					case('9'):
+						//sprite9.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 9);
+						break;
+					case('10'):
+						//sprite10.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 10);
+						break;
+					case('V'):
+						//spriteV.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 2);
+						break;
+					case('D'):
+					//	spriteD.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 3);
+						break;
+					case('K'):
+						//spriteK.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 4);
+						break;
+					case('T'):
+						//spriteT.setPosition(150 * CMP , Y - 255);
+						GAME.setFlag(CMP, 1);
+						GAME.setScore_player(GAME.getScore_player() + 11);
+						break;
+					}
+					CMP++;
+				}
+				if ((event.key.code == Mouse::Left) && (spritePEREMEWAT.getGlobalBounds().contains(mousePoz.x, mousePoz.y)))
+				{
+					if (fl == 0)
+						GAME.peremewat();
+				}
+				break;
+			}
+		}
+
+
+		//_________________________________________________________________________________________________________________________________
+
+
+
+		app.draw(spriteFON);
+		app.draw(spriteEWE);
+		app.draw(spriteHVATIT);
+		app.draw(spritePEREMEWAT);
+		app.draw(spriteR);
+		app.draw(text);
+		app.draw(textopponent1);
+		if(GAME.getGamers() == 3)
+		app.draw(textopponent2);
+		for (int i = 0; i < GAME.kolvo; i++)
+		{
+			if (GAME.getFlag(i) == 1)
+			{
+				if (GAME.takeCard(i) == '1')
+				{
+					sprite1.setPosition(150 * i, Y - 255);
+					app.draw(sprite1);
+				}
+				if (GAME.takeCard(i) == '2')
+				{
+					sprite2.setPosition(150 * i, Y - 255);
+					app.draw(sprite2);
+				}
+				if (GAME.takeCard(i) == '3')
+				{
+					sprite3.setPosition(150 * i, Y - 255);
+					app.draw(sprite3);
+				}
+				if (GAME.takeCard(i) == '4')
+				{
+					sprite4.setPosition(150 * i, Y - 255);
+					app.draw(sprite4);
+				}
+				if (GAME.takeCard(i) == '5')
+				{
+					sprite5.setPosition(150 * i, Y - 255);
+					app.draw(sprite5);
+				}
+				if (GAME.takeCard(i) == '6')
+				{
+					sprite6.setPosition(150 * i, Y - 255);
+					app.draw(sprite6);
+				}
+				if (GAME.takeCard(i) == '7')
+				{
+					sprite7.setPosition(150 * i, Y - 255);
+					app.draw(sprite7);
+				}
+				if (GAME.takeCard(i) == '8')
+				{
+					sprite8.setPosition(150 * i, Y - 255);
+					app.draw(sprite8);
+				}
+				if (GAME.takeCard(i) == '9')
+				{
+					sprite9.setPosition(150 * i, Y - 255);
+					app.draw(sprite9);
+				}
+				if (GAME.takeCard(i) == '10')
+				{
+					sprite10.setPosition(150 * i, Y - 255);
+					app.draw(sprite10);
+				}
+				if (GAME.takeCard(i) == 'V')
+				{
+					spriteV.setPosition(150 * i, Y - 255);
+					app.draw(spriteV);
+				}
+				if (GAME.takeCard(i) == 'D')
+				{
+					spriteD.setPosition(150 * i, Y - 255);
+					app.draw(spriteD);
+				}
+				if (GAME.takeCard(i) == 'K')
+				{
+					spriteK.setPosition(150 * i, Y - 255);
+					app.draw(spriteK);
+				}
+				if (GAME.takeCard(i) == 'T')
+				{
+					spriteT.setPosition(150 * i, Y - 255);
+					app.draw(spriteT);
+				}
+
+			}
+		}
+
+		if(you_win == 1)
+			app.draw(spriteWIN);
+		if (you_lose == 1)
+			app.draw(spriteLOSE);
+		if (draw == 1)
+			app.draw(spriteLOSE);
+		// Отрисовка кадра
+
+
+		app.display();
+
+	}
+
+
+
+	return 0;
+}
